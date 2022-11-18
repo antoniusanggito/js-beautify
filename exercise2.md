@@ -3,15 +3,15 @@ Pada direktori js/src/core/options.js
 
 ## Input Domain Model
 
-| Characteristics                           | b1          | b2            | b3              |
-|-------------------------------------------|-------------|---------------|-----------------|
-| q1 = "Banyak elemen dictionary"           | 0 elemen    | 1 elemen      | >1 elemen       |
-| q2 = "Keberadaan letak karakter dash (-)" | Tidak ada   | Pada 1 elemen | Pada >1 elemen  |
-| q3 = "Banyak karakter dash (-)"           | 0 ditemukan | 1 ditemukan   | >1 ditemukan    |
+| Characteristics                                     | b1          | b2            | b3              |
+|-----------------------------------------------------|-------------|---------------|-----------------|
+| q1 = "Banyak elemen dictionary"                     | 0 elemen    | 1 elemen      | >1 elemen       |
+| q2 = "Keberadaan letak karakter dash (-) pada key"  | Tidak ada   | Pada 1 elemen | Pada >1 elemen  |
+| q3 = "Banyak karakter dash (-) pada key"            | 0 ditemukan | 1 ditemukan   | >1 ditemukan    |
 
 Input domain dari parameter options fungsi normalizeOpts tersebut adalah sebuah dictionary atau object dengan key:string dan value:any. Fungsi ini digunakan untuk mengubah semua karakter dash (-) pada key dictionary menjadi underscore (_). 
 
-Partisi dibagi menjadi 3 karakteristik, berdasarkan elemen dictionary karena isinya bisa berbagai macam banyak elemen, lalu berdasarkan letak kebaradaan dash yang bisa pada beberapa elemen berbeda, dan banyak karakter dash yang ada pada input keseluruhan. Dengan ketiga karakteristik ini dikombinasikan akan cukup sensitif untuk memodelkan kemungkinan test case karena pengubahan karakter dash nantinya akan terpastikan berjalan pada setiap elemen-elemen pada dictionary, bahkan juga untuk beberapa dash yang ada pada satu elemen sekaligus secara rigorous.
+Partisi dibagi menjadi 3 karakteristik menggunakan interface-based approach untuk mencapai detail cases input secara lebih mendalam agar test lebih sensitif. Functionality-based tidak digunakan karena sulit mendeksripsikan input dari fungsi ini yang berupa dictionary dengan kemungkinannya yang cukup banyak. Tiga karakteristik tersebut meliputi berdasarkan elemen dictionary karena isinya bisa berbagai macam banyak elemen, lalu berdasarkan letak kebaradaan dash yang bisa pada beberapa elemen berbeda, dan banyak karakter dash yang ada pada input keseluruhan. Dengan ketiga karakteristik ini dikombinasikan akan cukup sensitif untuk memodelkan kemungkinan test case karena pengubahan karakter dash nantinya akan terpastikan berjalan pada setiap elemen-elemen pada dictionary, bahkan juga untuk beberapa dash yang ada pada satu elemen sekaligus secara rigorous.
 
 ## IDM Relabeling Table
 
@@ -22,7 +22,7 @@ Partisi dibagi menjadi 3 karakteristik, berdasarkan elemen dictionary karena isi
 | C               | C1  | C2  | C3  |
 
 ## Constraints
-
+Dari mengidentifikasi hubungan antarkarakteristik dapat dirumuskan constraints sebagai berikut:
 1. Isi dictionary 0 elemen implies tidak ada keberadaan karakter dash, ditemukan sebanyak 0 karakter dash (jika A1 maka hanya perlu A1B1C1, tidak perlu A1BxCx lain)
 2. Isi dictionary 1 elemen implies karakter dash tidak pada >1 elemen (jika A2 maka hanya perlu A2B1Cx dan A2B2Cx, tidak perlu A2B3Cx)
 3. Keberadaan karakter dash tidak ada implies 0 karakter dash ditemukan (jika B1 maka hanya perlu AxB1C1, tidak perlu AxB1Cx lain), dan sebaliknya (jika C1 maka hanya perlu AxB1C1, tidak perlu AxBxC1 lain)
@@ -32,7 +32,7 @@ Partisi dibagi menjadi 3 karakteristik, berdasarkan elemen dictionary karena isi
 
 Criteria Used: ACoC
 
-ACoC digunakan karena meskipun blok pada domain model terlihat cukup banyak (3x3x3 -> 27 total cases), namun dengan constraints yang ditetapkan berdasarkan pengetahuan akan problem domain, dapat diprune menjadi hanya tinggal 8 test cases. Dengan begitu menggunakan kriteria ACoC yang 'paling kuat' ini akan masih managable dengan keuntungan tingkat sensitivitas yang tinggi.
+ACoC efektif digunakan karena meskipun blok pada domain model terlihat cukup banyak (3x3x3 -> 27 total cases), namun dengan constraints yang ditetapkan berdasarkan pengetahuan akan problem domain, dapat diprune menjadi hanya tinggal 8 test cases. Dengan begitu menggunakan kriteria ACoC yang 'paling kuat' ini akan masih managable dan efektif dengan keuntungan tingginya tingkat sensitivitas test suite.
 
 | Test Value  | Example Input           | Expected Output         |
 |-------------|-------------------------|-------------------------|
