@@ -44,3 +44,5 @@ ACoC efektif digunakan karena meskipun blok pada domain model terlihat cukup ban
 | A3B2C2      | {'a': 1, 'b-c': 2}      | {'a': 1, 'b_c': 2}      | 
 | A3B2C3      | {'a-b-c': 1, 'c': 2}    | {'a_b_c': 1, 'c': 2}    | 
 | A3B3C3      | {'a-b-c': 1, 'c-d': 2}  | {'a-b-c': 1, 'c-d': 2}  | 
+
+Dari hasil modeling ini dibandingkan dengan test suite yang sudah ada, ternyata ada test values yang belum tercover. Test suite yang ada hanya membagi 2 test cases yakni yang mereplace - menjadi _ dan yang tidak mereplace dari input yang diberikan, terlepas dari contoh kasus beberapa dash pada satu elemen atau kasus-kasus lain yang lebih detil pada model di atas.
