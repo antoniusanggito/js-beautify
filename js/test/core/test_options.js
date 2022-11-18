@@ -36,20 +36,41 @@ describe('Options', function() {
   });
 
   describe('normalizeOpts', function() {
-    it('should replace key with - to _', function() {
+    it('should return empty options', function() {
+      assert.deepEqual(options.normalizeOpts({}), {});
+    });
+    it('should do nothing without - on key', function() {
       assert.deepEqual(options.normalizeOpts({
-        'a-b': 1
+        'a_b': 1
       }), {
         a_b: 1
       });
     });
-    it('should do nothing', function() {
-      assert.deepEqual(options.mergeOpts({
+    it('should replace a key with - to _', function() {
+      assert.deepEqual(options.normalizeOpts({
+        'a': 1,
+        'b-c': 2
+      }), {
         a: 1,
         b_c: 2
-      }, 'b'), {
-        a: 1,
-        b_c: 2
+      });
+    });
+    it('should replace a key with multiple - to _', function() {
+      assert.deepEqual(options.normalizeOpts({
+        'a-b-c': 1,
+        'c': 2
+      }), {
+        a_b_c: 1,
+        c: 2
+      });
+    });
+    it('should replace multiple key with multiple - to _', function() {
+      assert.deepEqual(options.normalizeOpts({
+        'a-b-c': 1,
+        'c-d': 2
+      }), {
+        a_b_c: 1,
+        c_d: 2
       });
     });
   });
