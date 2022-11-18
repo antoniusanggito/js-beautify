@@ -5,44 +5,40 @@ Pada direktori js/src/core/options.js
 
 | Characteristics                                     | b1          | b2            | b3              |
 |-----------------------------------------------------|-------------|---------------|-----------------|
-| q1 = "Banyak elemen dictionary"                     | 0 elemen    | 1 elemen      | >1 elemen       |
+| q1 = "Isi dictionary"                               | 0 elemen    | >=1 elemen    |                 |
 | q2 = "Keberadaan letak karakter dash (-) pada key"  | Tidak ada   | Pada 1 elemen | Pada >1 elemen  |
 | q3 = "Banyak karakter dash (-) pada key"            | 0 ditemukan | 1 ditemukan   | >1 ditemukan    |
 
-Input domain dari parameter options fungsi normalizeOpts tersebut adalah sebuah dictionary atau object dengan key:string dan value:any. Fungsi ini digunakan untuk mengubah semua karakter dash (-) pada key dictionary menjadi underscore (_). 
+Input domain dari parameter options fungsi normalizeOpts tersebut adalah sebuah dictionary atau object dengan key:string dan value:any. Fungsi ini digunakan untuk normalisasi options dengan mengubah semua karakter dash (-) pada key dictionary menjadi underscore (_). 
 
-Partisi dibagi menjadi 3 karakteristik menggunakan interface-based approach untuk mencapai detail cases input secara lebih mendalam agar test lebih sensitif. Functionality-based tidak digunakan karena sulit mendeksripsikan input dari fungsi ini yang berupa dictionary dengan kemungkinannya yang cukup banyak. Tiga karakteristik tersebut meliputi berdasarkan elemen dictionary karena isinya bisa berbagai macam banyak elemen, lalu berdasarkan letak kebaradaan dash yang bisa pada beberapa elemen berbeda, dan banyak karakter dash yang ada pada input keseluruhan. Dengan ketiga karakteristik ini dikombinasikan akan cukup sensitif untuk memodelkan kemungkinan test case karena pengubahan karakter dash nantinya akan terpastikan berjalan pada setiap elemen-elemen pada dictionary, bahkan juga untuk beberapa dash yang ada pada satu elemen sekaligus secara rigorous.
+Partisi dibagi menjadi 3 karakteristik menggunakan interface-based approach untuk mencapai detail cases input secara lebih mendalam agar test lebih sensitif. Functionality-based tidak digunakan karena sulit mendeksripsikan input dari fungsi ini yang berupa dictionary dengan kemungkinannya yang cukup banyak. Tiga karakteristik tersebut meliputi berdasarkan isi dictionary bisa kosong atau berisi 1 atau lebih elemen, lalu berdasarkan letak kebaradaan dash yang bisa pada beberapa elemen berbeda, dan banyak karakter dash yang ada pada input keseluruhan. Dengan ketiga karakteristik ini dikombinasikan akan cukup sensitif untuk memodelkan kemungkinan test case karena pengubahan karakter dash nantinya akan terpastikan berjalan pada setiap elemen-elemen pada dictionary, bahkan juga untuk beberapa dash yang ada pada satu elemen sekaligus secara rigorous.
 
 ## IDM Relabeling Table
 
 | Characteristics | b1  | b2  | b3  |
 |-----------------|-----|-----|-----|
-| A               | A1  | A2  | A3  |
+| A               | A1  | A2  |     |
 | B               | B1  | B2  | B3  |
 | C               | C1  | C2  | C3  |
 
 ## Constraints
 Dari mengidentifikasi hubungan antarkarakteristik dapat dirumuskan constraints sebagai berikut:
-1. Isi dictionary 0 elemen implies tidak ada keberadaan karakter dash, ditemukan sebanyak 0 karakter dash (jika A1 maka hanya perlu A1B1C1, tidak perlu A1BxCx lain)
-2. Isi dictionary 1 elemen implies karakter dash tidak pada >1 elemen (jika A2 maka hanya perlu A2B1Cx dan A2B2Cx, tidak perlu A2B3Cx)
-3. Keberadaan karakter dash tidak ada implies 0 karakter dash ditemukan (jika B1 maka hanya perlu AxB1C1, tidak perlu AxB1Cx lain), dan sebaliknya (jika C1 maka hanya perlu AxB1C1, tidak perlu AxBxC1 lain)
-4. Ditemukan 1 karakter dash implies dash hanya ada pada 1 elemen (jika C2 maka hanya perlu AxB2C2, tidak perlu AxBxC2 lain)
+1. Isi dictionary 0 elemen implies tidak ada keberadaan karakter dash, ditemukan sebanyak 0 karakter dash pada key (jika A1 maka hanya perlu A1B1C1, tidak perlu A1BxCx lain)
+2. Tidak adanya letak karakter dash pada key manapun implies 0 karakter dash ditemukan (jika B1 maka hanya perlu AxB1C1, tidak perlu AxB1Cx lain), dan sebaliknya (jika C1 maka hanya perlu AxB1C1, tidak perlu AxBxC1 lain)
+3. Ditemukan 1 karakter dash pada key implies dash hanya ada pada key 1 elemen (jika C2 maka hanya perlu AxB2C2, tidak perlu AxBxC2 lain)
 
 ## Test Values and Example I/O
 
 Criteria Used: ACoC
 
-ACoC efektif digunakan karena meskipun blok pada domain model terlihat cukup banyak (3x3x3 -> 27 total cases), namun dengan constraints yang ditetapkan berdasarkan pengetahuan akan problem domain, dapat diprune menjadi hanya tinggal 8 test cases. Dengan begitu menggunakan kriteria ACoC yang 'paling kuat' ini akan masih managable dan efektif dengan keuntungan tingginya tingkat sensitivitas test suite.
+ACoC efektif digunakan karena meskipun blok pada domain model terlihat cukup banyak (2x3x3 -> 18 total cases), namun dengan constraints yang ditetapkan berdasarkan pengetahuan akan problem domain, dapat diprune menjadi hanya tinggal 5 test cases. Dengan begitu menggunakan kriteria ACoC yang merupakan 'paling kuat' ini akan masih managable dan sangat efektif dengan keuntungan yakni tingginya tingkat sensitivitas test suite.
 
 | Test Value  | Example Input           | Expected Output         |
 |-------------|-------------------------|-------------------------|
 | A1B1C1      | {}                      | {}                      |
 | A2B1C1      | {'a_b': 1}              | {'a_b': 1}              |
-| A2B2C2      | {'a-b': 1}              | {'a_b': 1}              |
-| A2B2C3      | {'a-b-c': 2}            | {'a_b_c': 2}            |
-| A3B1C1      | {'a_b': 1, 'c': 2}      | {'a_b': 1, 'c': 2}      |
-| A3B2C2      | {'a': 1, 'b-c': 2}      | {'a': 1, 'b_c': 2}      | 
-| A3B2C3      | {'a-b-c': 1, 'c': 2}    | {'a_b_c': 1, 'c': 2}    | 
-| A3B3C3      | {'a-b-c': 1, 'c-d': 2}  | {'a-b-c': 1, 'c-d': 2}  | 
+| A2B2C2      | {'a': 1, 'b-c': 2}      | {'a': 1, 'b_c': 2}      | 
+| A2B2C3      | {'a-b-c': 1, 'c': 2}    | {'a_b_c': 1, 'c': 2}    | 
+| A2B3C3      | {'a-b-c': 1, 'c-d': 2}  | {'a-b-c': 1, 'c-d': 2}  | 
 
-Dari hasil modeling ini dibandingkan dengan test suite yang sudah ada, ternyata ada test values yang belum tercover. Test suite yang ada hanya membagi 2 test cases yakni yang mereplace - menjadi _ dan yang tidak mereplace dari input yang diberikan, terlepas dari contoh kasus beberapa dash pada satu elemen atau kasus-kasus lain yang lebih detil pada model di atas.
+Dari hasil modeling ini dibandingkan dengan test suite yang sudah ada, ternyata ada test values yang belum tercover. Test suite yang ada hanya membagi 2 test cases yakni yang mereplace - menjadi _ dan yang tidak mereplace dari input yang diberikan. Belum mengcover contoh kasus seperti beberapa dash pada satu elemen atau kasus lain yang lebih detil seperti pada model di atas.
